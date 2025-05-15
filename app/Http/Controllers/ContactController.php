@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Contact;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ContactController extends Controller
@@ -13,7 +14,7 @@ class ContactController extends Controller
      */
     public function index()
     {
-        $contacts = Contact::all();
+        $contacts = Contact::latest()->get();
         return Inertia::render('contacts/index', [
             'contacts' => $contacts,
         ]);
@@ -32,7 +33,17 @@ class ContactController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email',
+            'mobile' => 'required',
+            'address' => 'required',
+        ]);
+
+        $validatedData['user_id'] = $request->user()->id;
+        Contact::create($validatedData);
+
+        return redirect()->route('contacts.index')->with(['success' , 'Contact created successfully']);
     }
 
     /**
@@ -48,7 +59,9 @@ class ContactController extends Controller
      */
     public function edit(Contact $contact)
     {
-        //
+        return Inertia::render('contacts/edit', [
+            'contact' => $contact,
+        ]);
     }
 
     /**
@@ -56,7 +69,16 @@ class ContactController extends Controller
      */
     public function update(Request $request, Contact $contact)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => 'required',
+            'email' => 'nullable|email',
+            'mobile' => 'required|numeric|digits:11|unique:contacts,mobile,' . $contact->id,
+            'address' => 'required',
+        ]);
+
+        $contact->update($validatedData);
+
+        return redirect()->route('contacts.index')->with(['success' , 'Contact updated successfully']);
     }
 
     /**
@@ -64,6 +86,8 @@ class ContactController extends Controller
      */
     public function destroy(Contact $contact)
     {
-        //
+        $contact->delete();
+
+        return redirect()->route('contacts.index')->with(['success', 'Contact deleted successfully']);
     }
 }

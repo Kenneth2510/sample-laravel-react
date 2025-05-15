@@ -19,32 +19,32 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/contacts',
     },
     {
-        title: 'Create',
-        href: '/contacts/create',
+        title: 'Edit',
+        href: '/contacts/edit',
     },
 ];
 
-export default function CreateContact() {
-    const { data, setData, post, processing, errors } = useForm({
-        name: '',
-        email: '',
-        mobile: '',
-        address: '',
+export default function EditContact({ contact }: { contact: any }) {
+    const { data, setData, put, processing, errors } = useForm({
+        name: contact.name,
+        email: contact.email,
+        mobile: contact.mobile,
+        address: contact.address,
     });
 
     const handleSubmit = (e: React.FormEvent)=>{
         e.preventDefault();
-        post('/contacts');
+        put(`/contacts/${contact.id}`);
     }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create Contact" />
+            <Head title="Edit Contact" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <Card>
                     <CardHeader>
                         <div className='flex justify-between items-center'>
-                            <CardTitle>Create Contact</CardTitle>
+                            <CardTitle>Edit Contact</CardTitle>
                             <Link href='/contacts'>
                                 <Button variant='outline'>
                                     <ArrowLeftIcon className='w-4 h-4' />
@@ -107,7 +107,7 @@ export default function CreateContact() {
                                 {errors.address && <p className='text-red-500'>{errors.address}</p>}
                             </div>
                             <div>
-                            <Button type='submit' disabled={processing}>
+                                <Button type='submit' disabled={processing}>
                                     {processing ? 'Saving...' : 'Save'}
                                 </Button>
                             </div>
