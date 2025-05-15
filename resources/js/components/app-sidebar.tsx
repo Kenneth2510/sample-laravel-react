@@ -2,23 +2,13 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { SharedData, type NavItem } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Users } from 'lucide-react';
 import AppLogo from './app-logo';
+import { useInitials } from '@/hooks/use-initials';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Contacts',
-        href: '/contacts',
-        icon: Users,
-    },
-];
+
 
 const footerNavItems: NavItem[] = [
     {
@@ -34,6 +24,25 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+
+        const page = usePage<SharedData>();
+        const { auth } = page.props;
+        // const getInitials = useInitials();
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
+        ...(auth.can.contacts.viewAny ? [{
+            title: 'Contacts',
+            href: '/contacts',
+            icon: Users,
+        }]:[]),
+    ];
+
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>

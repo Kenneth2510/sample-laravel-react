@@ -35,9 +35,15 @@ interface Contact {
     email: string;
     mobile: string;
     address: string;
+    user_id: number;
+    created_at: string;
+    can: {
+        update: boolean;
+        delete: boolean;
+    };
 }
 
-export default function Contacts({ contacts }: { contacts: Contact[] }) {
+export default function Contacts({ contacts, auth }: { contacts: { data: Contact[] }, auth: any }) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteContactId, setDeleteContactId] = useState<number | null>(null);
 
@@ -60,12 +66,12 @@ export default function Contacts({ contacts }: { contacts: Contact[] }) {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Contacts</h1>
-                    <Link href="contacts/create">
+                    {auth.can.contacts.create && (<Link href="contacts/create">
                         <Button>
                             <PlusIcon className="h-4 w-4" />
                             Add Contact
                         </Button>
-                    </Link>
+                    </Link>)}
                 </div>
                 <div className="flex flex-col gap-4">
                     <Card>
@@ -87,7 +93,7 @@ export default function Contacts({ contacts }: { contacts: Contact[] }) {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {contacts.map((contact) => (
+                                        {contacts.data.map((contact) => (
                                             <TableRow key={contact.id}>
                                                 <TableCell className="font-medium">{contact.id}</TableCell>
                                                 <TableCell>{contact.name}</TableCell>
@@ -95,14 +101,14 @@ export default function Contacts({ contacts }: { contacts: Contact[] }) {
                                                 <TableCell>{contact.mobile}</TableCell>
                                                 <TableCell>{contact.address}</TableCell>
                                                 <TableCell>
-                                                    <Link href={`/contacts/${contact.id}/edit`}>
+                                                {contact.can.update && (<Link href={`/contacts/${contact.id}/edit`}>
                                                         <Button variant="outline">
                                                             <EditIcon className="h-4 w-4" />
                                                         </Button>
-                                                    </Link>
-                                                    <Button variant="outline" onClick={() => handleDelete(contact.id)}>
+                                                    </Link>)}
+                                                    {contact.can.delete && (<Button variant="outline" onClick={() => handleDelete(contact.id)}>
                                                         <TrashIcon className="h-4 w-4" />
-                                                    </Button>
+                                                    </Button>)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -113,7 +119,7 @@ export default function Contacts({ contacts }: { contacts: Contact[] }) {
                     </Card>
                 </div>
                 <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                    <AlertDialogTrigger>Open</AlertDialogTrigger>
+                    {/* <AlertDialogTrigger>Open</AlertDialogTrigger> */}
                     <AlertDialogContent>
                         <AlertDialogHeader>
                             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

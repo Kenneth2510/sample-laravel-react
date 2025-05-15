@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Contact;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -45,6 +46,12 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+                'can' => [
+                    'contacts' => [
+                        'viewAny' => $request->user()?->can('viewAny', Contact::class),
+                        'create' => $request->user()?->can('create', Contact::class),
+                    ]
+                ],
             ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
